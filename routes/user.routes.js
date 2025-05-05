@@ -6,26 +6,21 @@ const { body, validationResult } = require('express-validator');
 // to show form
 router.get('/register', (req, res) => {
     res.render('register');
-})
+});
 
 router.post('/register', [
-    body('name').notEmpty().withMessage('Name is required'),
-    body('email').isEmail().withMessage('Email is required'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    body('user_name').trim().notEmpty().withMessage('Username is required'),
+    body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('password').trim().isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ], (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).render('register', { 
-            errors: errors.array(),
-            message: 'Invalid credentials',
-            oldInput: req.body
-        });
+        console.log(errors.array());
+        return res.status(400).json({ errors: errors.array() });
     }
-
-    const { name, email, password } = req.body;
-    console.log(req.body);
     
-    // Continue with registration logic here
-})
+    console.log('Form data received:', req.body);
+    res.send('User registered successfully!');
+}); 
 
 module.exports = router;
